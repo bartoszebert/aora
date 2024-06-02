@@ -5,7 +5,8 @@ import { images } from "../../constants";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
 import { Link, router } from "expo-router";
-import { signIn } from "@/lib/appwrite";
+import { getCurrentUser, signIn } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 interface ISignInData {
   email: string;
@@ -19,6 +20,8 @@ const SignIn = () => {
     password: "",
   });
 
+  const { setUser, setIsLogged } = useGlobalContext();
+
   const submit = async () => {
     if (!form.email || !form.password)
       Alert.alert("Error", "Please fill in all fields");
@@ -26,8 +29,9 @@ const SignIn = () => {
 
     try {
       await signIn(form.email, form.password);
-      
-      // set it to the global state
+      const result = await getCurrentUser();
+      setUser(result);
+      setIsLogged(true);
 
       router.replace("/home");
     } catch (error) {
