@@ -109,3 +109,16 @@ export const getAllPosts = async () => {
     throw new Error("Failed to get posts");
   }
 };
+
+export const getLatestPosts = async () => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId, [
+      Query.orderDesc("$createdAt"),
+      Query.limit(7),
+    ]);
+
+    return posts.documents;
+  } catch (error) {
+    throw new Error("Failed to get posts");
+  }
+};

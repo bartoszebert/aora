@@ -1,6 +1,7 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import icons from "../constants/icons";
+import WebViewVideo from "./WebViewVideo";
 
 interface Props {
   video: {
@@ -52,9 +53,12 @@ const VideoCard = ({
         </View>
       </View>
       {play ? (
-        <View>
-          <Text className="text-white">Playing</Text>
-        </View>
+        <WebViewVideo
+          video={video}
+          handleVideoEnd={() => setPlay(false)}
+          videoStyles="w-full h-60 rounded-xl mt-3"
+          videoWrapperStyles="w-full h-60"
+        />
       ) : (
         <TouchableOpacity
           activeOpacity={0.7}
