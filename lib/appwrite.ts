@@ -1,4 +1,11 @@
-import { Account, Avatars, Client, Databases, ID, Query } from "react-native-appwrite";
+import {
+  Account,
+  Avatars,
+  Client,
+  Databases,
+  ID,
+  Query,
+} from "react-native-appwrite";
 
 export const config = {
   endpoint: "https://cloud.appwrite.io/v1",
@@ -10,11 +17,18 @@ export const config = {
   storageId: "665c612c00128bd569b4",
 };
 
+const {
+  endpoint,
+  platform,
+  projectId,
+  databaseId,
+  userCollectionId,
+  videoCollectionId,
+  storageId,
+} = config;
+
 const client = new Client();
-client
-  .setEndpoint(config.endpoint)
-  .setProject(config.projectId)
-  .setPlatform(config.platform);
+client.setEndpoint(endpoint).setProject(projectId).setPlatform(platform);
 
 const account = new Account(client);
 const avatars = new Avatars(client);
@@ -37,8 +51,8 @@ export const createUser = async (
 
     const avatarUrl = avatars.getInitials(username);
     const newUser = await databases.createDocument(
-      config.databaseId,
-      config.userCollectionId,
+      databaseId,
+      userCollectionId,
       ID.unique(),
       {
         username,
@@ -47,7 +61,7 @@ export const createUser = async (
         accountId: newAccount.$id,
       }
     );
-    
+
     await signIn(email, password);
 
     return newUser;
@@ -70,18 +84,28 @@ export const getCurrentUser = async () => {
   try {
     const currentAccount = await account.get();
 
-    if (!currentAccount) throw new Error;
+    if (!currentAccount) throw new Error();
 
     const currentUser = await databases.listDocuments(
-       config.databaseId,
-       config.userCollectionId,
-       [Query.equal("accountId", currentAccount.$id)]
+      databaseId,
+      userCollectionId,
+      [Query.equal("accountId", currentAccount.$id)]
     );
 
-    if(!currentUser) throw new Error;
+    if (!currentUser) throw new Error();
 
     return currentUser.documents[0];
   } catch (error) {
     throw new Error("Failed to get user");
   }
-}
+};
+
+export const getAllPosts = async () => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId);
+
+    return posts.documents;
+  } catch (error) {
+    throw new Error("Failed to get posts");
+  }
+};
